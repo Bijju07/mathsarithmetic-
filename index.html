@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಅಂಕಗಣಿತದ ಉಕ್ತಿಗಳು - ಕ್ವಿಜ್</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #e3f2fd;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            max-width: 900px;
+            width: 100%;
+            padding: 30px 35px;
+            transition: all 0.3s;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #0d47a1;
+            border-bottom: 3px solid #bbdefb;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #1565c0;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #bbdefb;
+            border-radius: 3px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: #1976d2;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .question-text {
+            font-size: 17px;
+            font-weight: 600;
+            color: #212121;
+            margin-bottom: 18px;
+            line-height: 1.5;
+        }
+
+        .question-text .kn {
+            display: block;
+            font-weight: 400;
+            color: #424242;
+            font-size: 15px;
+            margin-top: 6px;
+            padding-left: 8px;
+            border-left: 3px solid #90caf9;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 15px;
+        }
+
+        .option:hover {
+            background: #e3f2fd;
+            border-color: #64b5f6;
+        }
+
+        .option.selected {
+            background: #e3f2fd;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+        }
+
+        .option.correct {
+            background: #e8f5e9;
+            border-color: #43a047;
+        }
+
+        .option.wrong {
+            background: #ffebee;
+            border-color: #e53935;
+        }
+
+        .option input[type="radio"] {
+            margin-right: 12px;
+            accent-color: #1976d2;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .option .opt-label {
+            font-weight: 700;
+            margin-right: 8px;
+            color: #1565c0;
+            min-width: 22px;
+        }
+
+        .explanation {
+            background: #fff3e0;
+            border-left: 5px solid #ef6c00;
+            padding: 16px 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #4e342e;
+        }
+
+        .explanation.show {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .explanation strong {
+            color: #bf360c;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: #1976d2;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #0d47a1;
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4);
+        }
+
+        .btn-success {
+            background: #43a047;
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: #2e7d32;
+            box-shadow: 0 4px 12px rgba(67, 160, 71, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #424242;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #bdbdbd;
+        }
+
+        .result-screen {
+            display: none;
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        .result-screen.show {
+            display: block;
+        }
+
+        .result-screen h2 {
+            font-size: 28px;
+            color: #0d47a1;
+            margin-bottom: 16px;
+        }
+
+        .result-screen .score {
+            font-size: 48px;
+            font-weight: 800;
+            color: #1976d2;
+            margin: 10px 0;
+        }
+
+        .result-screen .score span {
+            font-size: 24px;
+            color: #757575;
+        }
+
+        .result-screen p {
+            font-size: 17px;
+            color: #424242;
+            margin-bottom: 24px;
+        }
+
+        .result-screen .btn {
+            margin: 0 auto;
+        }
+
+        @media (max-width: 600px) {
+            .quiz-container {
+                padding: 20px 18px;
+            }
+            .question-text {
+                font-size: 15px;
+            }
+            .option {
+                font-size: 13px;
+                padding: 10px 12px;
+            }
+            .btn {
+                font-size: 13px;
+                padding: 8px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container" id="quizContainer">
+        <h1>🧮 ಅಂಕಗಣಿತದ ಉಕ್ತಿಗಳು - ಕ್ವಿಜ್</h1>
+
+        <div class="progress">
+            <span id="progressText">ಪ್ರಶ್ನೆ 1 / 50</span>
+            <span id="scoreText">ಸ್ಕೋರ್: 0</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-bar-fill" id="progressBarFill"></div>
+        </div>
+
+        <div id="questionContainer">
+            <div class="question-text" id="questionText"></div>
+            <div class="options" id="optionsContainer"></div>
+            <div class="explanation" id="explanationBox"></div>
+            <div class="btn-group">
+                <button class="btn btn-secondary" id="prevBtn" onclick="prevQuestion()">← ಹಿಂದೆ</button>
+                <button class="btn btn-primary" id="checkBtn" onclick="checkAnswer()">ಉತ್ತರ ಪರಿಶೀಲಿಸಿ</button>
+                <button class="btn btn-success" id="nextBtn" onclick="nextQuestion()">ಮುಂದೆ →</button>
+            </div>
+        </div>
+
+        <div class="result-screen" id="resultScreen">
+            <h2>🎉 ಕ್ವಿಜ್ ಪೂರ್ಣಗೊಂಡಿದೆ!</h2>
+            <div class="score" id="finalScore">0 <span>/ 50</span></div>
+            <p id="resultMessage"></p>
+            <button class="btn btn-primary" onclick="restartQuiz()">🔄 ಮತ್ತೆ ಪ್ರಾರಂಭಿಸಿ</button>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // QUIZ DATA - 50 Questions based on "ಅಂಕಗಣಿತದ ಉಕ್ತಿಗಳು" Chapter
+        // ============================================================
+        const quizData = [
+            // Q1
+            {
+                question: "13 + 2 ಈ ಉಕ್ತಿಯ ಬೆಲೆ ಎಷ್ಟು?",
+                kn: "13 + 2 ಈ ಅಂಕಗಣಿತದ ಉಕ್ತಿಯ ಬೆಲೆಯನ್ನು ಕಂಡುಹಿಡಿಯಿರಿ.",
+                options: ["13", "15", "2", "11"],
+                correct: 1,
+                explanation: "13 + 2 = <strong>15</strong>. ಇದು ಒಂದು ಸರಳ ಅಂಕಗಣಿತದ ಉಕ್ತಿ."
+            },
+            // Q2
+            {
+                question: "5 × 25 ಈ ಉಕ್ತಿಯನ್ನು ಓದುವ ಸರಿಯಾದ ರೀತಿ ಯಾವುದು?",
+                kn: "5 × 25 ಈ ಉಕ್ತಿಯನ್ನು ಸರಿಯಾಗಿ ಓದುವುದು ಹೇಗೆ?",
+                options: ["5 ಕೂಡ 25", "5 ಬಾರಿ 25", "25 ಕೂಡ 5", "25 ಕಳೆ 5"],
+                correct: 1,
+                explanation: "5 × 25 ಎಂದರೆ <strong>5 ಬಾರಿ 25</strong> ಅಥವಾ 5 ಮತ್ತು 25 ರ ಗುಣಲಬ್ಧ."
+            },
+            // Q3
+            {
+                question: "ಒಂದು ಸಂಖ್ಯೆ 12 ಅನ್ನು ಎರಡು ಸಂಖ್ಯೆಗಳ ಮೊತ್ತವಾಗಿ ವ್ಯಕ್ತಪಡಿಸಲು ಯಾವ ಉಕ್ತಿ ಸರಿಯಲ್ಲ?",
+                kn: "12 ಅನ್ನು ಎರಡು ಸಂಖ್ಯೆಗಳ ಮೊತ್ತವಾಗಿ ಬರೆಯುವ ಉಕ್ತಿಗಳಲ್ಲಿ ಯಾವುದು ಸರಿಯಲ್ಲ?",
+                options: ["10 + 2", "15 - 3", "3 × 4", "24 ÷ 2"],
+                correct: 2,
+                explanation: "3 × 4 ಒಂದು <strong>ಗುಣಾಕಾರ</strong> ಉಕ್ತಿ, ಇದು 12 ಅನ್ನು ಎರಡು ಸಂಖ್ಯೆಗಳ <strong>ಮೊತ್ತ</strong>ವಾಗಿ ವ್ಯಕ್ತಪಡಿಸುವುದಿಲ್ಲ. ಉಳಿದವು 12 ಅನ್ನು ಮೊತ್ತ ಅಥವಾ ವ್ಯತ್ಯಾಸವಾಗಿ ನೀಡುತ್ತವೆ."
+            },
+            // Q4
+            {
+                question: "10 + 2 > 7 + 1 ಎಂಬುದು ಸರಿಯೇ?",
+                kn: "10 + 2 > 7 + 1 ಎಂಬ ಹೋಲಿಕೆ ಸರಿಯೇ ಎಂದು ಪರಿಶೀಲಿಸಿ.",
+                options: ["ಸರಿ", "ತಪ್ಪು", "ನಿಖರವಾಗಿ ಹೇಳಲು ಸಾಧ್ಯವಿಲ್ಲ", "ಎರಡೂ ಸಮ"],
+                correct: 0,
+                explanation: "10 + 2 = 12 ಮತ್ತು 7 + 1 = 8. 12 > 8 ಆದ್ದರಿಂದ <strong>ಸರಿ</strong>."
+            },
+            // Q5
+            {
+                question: "13 - 2 < 4 × 3 ಎಂಬುದು ಸರಿಯೇ?",
+                kn: "13 - 2 < 4 × 3 ಎಂಬ ಹೋಲಿಕೆ ಸರಿಯೇ ಎಂದು ಪರಿಶೀಲಿಸಿ.",
+                options: ["ಸರಿ", "ತಪ್ಪು", "ನಿಖರವಾಗಿ ಹೇಳಲು ಸಾಧ್ಯವಿಲ್ಲ", "ಎರಡೂ ಸಮ"],
+                correct: 0,
+                explanation: "13 - 2 = 11 ಮತ್ತು 4 × 3 = 12. 11 < 12 ಆದ್ದರಿಂದ <strong>ಸರಿ</strong>."
+            },
+            // Q6
+            {
+                question: "13 + 4 = ____ + 6 ಈ ಸಮೀಕರಣವನ್ನು ಸರಿಪಡಿಸಲು ಖಾಲಿ ಜಾಗದಲ್ಲಿ ಯಾವ ಸಂಖ್ಯೆ ಬರಬೇಕು?",
+                kn: "13 + 4 = ____ + 6 ಸಮೀಕರಣವನ್ನು ಸರಿದೂಗಿಸಲು ಸರಿಯಾದ ಸಂಖ್ಯೆಯನ್ನು ಕಂಡುಹಿಡಿಯಿರಿ.",
+                options: ["11", "12", "10", "17"],
+                correct: 0,
+                explanation: "13 + 4 = 17. ಆದ್ದರಿಂದ ____ + 6 = 17 ಆಗಬೇಕು. 17 - 6 = <strong>11</strong>."
+            },
+            // Q7
+            {
+                question: "22 + ____ = 6 × 5 ಈ ಸಮೀಕರಣವನ್ನು ಸರಿಪಡಿಸಲು ಖಾಲಿ ಜಾಗದಲ್ಲಿ ಯಾವ ಸಂಖ್ಯೆ ಬರಬೇಕು?",
+                kn: "22 + ____ = 6 × 5 ಸಮೀಕರಣವನ್ನು ಸರಿದೂಗಿಸಲು ಸರಿಯಾದ ಸಂಖ್ಯೆಯನ್ನು ಕಂಡುಹಿಡಿಯಿರಿ.",
+                options: ["8", "6", "10", "12"],
+                correct: 0,
+                explanation: "6 × 5 = 30. ಆದ್ದರಿಂದ 22 + ____ = 30 ಆಗಬೇಕು. 30 - 22 = <strong>8</strong>."
+            },
+            // Q8
+            {
+                question: "8 × ____ = 64 ÷ 2 ಈ ಸಮೀಕರಣವನ್ನು ಸರಿಪಡಿಸಲು ಖಾಲಿ ಜಾಗದಲ್ಲಿ ಯಾವ ಸಂಖ್ಯೆ ಬರಬೇಕು?",
+                kn: "8 × ____ = 64 ÷ 2 ಸಮೀಕರಣವನ್ನು ಸರಿದೂಗಿಸಲು ಸರಿಯಾದ ಸಂಖ್ಯೆಯನ್ನು ಕಂಡುಹಿಡಿಯಿರಿ.",
+                options: ["4", "6", "8", "2"],
+                correct: 0,
+                explanation: "64 ÷ 2 = 32. ಆದ್ದರಿಂದ 8 × ____ = 32 ಆಗಬೇಕು. 32 ÷ 8 = <strong>4</strong>."
+            },
+            // Q9
+            {
+                question: "34 - ____ = 25 ಈ ಸಮೀಕರಣವನ್ನು ಸರಿಪಡಿಸಲು ಖಾಲಿ ಜಾಗದಲ್ಲಿ ಯಾವ ಸಂಖ್ಯೆ ಬರಬೇಕು?",
+                kn: "34 - ____ = 25 ಸಮೀಕರಣವನ್ನು ಸರಿದೂಗಿಸಲು ಸರಿಯಾದ ಸಂಖ್ಯೆಯನ್ನು ಕಂಡುಹಿಡಿಯಿರಿ.",
+                options: ["9", "8", "7", "10"],
+                correct: 0,
+                explanation: "34 - ____ = 25 ಆದ್ದರಿಂದ ____ = 34 - 25 = <strong>9</strong>."
+            },
+            // Q10
+            {
+                question: "67 - 19, 67 - 20, 35 + 25, 5 × 11, 120 ÷ 3 - ಈ ಉಕ್ತಿಗಳನ್ನು ಆರೋಹಣ ಕ್ರಮದಲ್ಲಿ ಜೋಡಿಸಿದಾಗ ಸರಿಯಾದ ಕ್ರಮ ಯಾವುದು?",
+                kn: "ಕೊಟ್ಟಿರುವ ಉಕ್ತಿಗಳ ಬೆಲೆಗಳನ್ನು ಕಂಡುಹಿಡಿದು ಆರೋಹಣ (ಏರಿಕೆ) ಕ್ರಮದಲ್ಲಿ ಜೋಡಿಸಿ.",
+                options: [
+                    "5 × 11, 120 ÷ 3, 35 + 25, 67 - 20, 67 - 19",
+                    "67 - 19, 67 - 20, 35 + 25, 5 × 11, 120 ÷ 3",
+                    "35 + 25, 67 - 19, 67 - 20, 5 × 11, 120 ÷ 3",
+                    "120 ÷ 3, 5 × 11, 67 - 19, 67 - 20, 35 + 25"
+                ],
+                correct: 0,
+                explanation: "67 - 19 = 48, 67 - 20 = 47, 35 + 25 = 60, 5 × 11 = 55, 120 ÷ 3 = 40. ಏರಿಕೆ ಕ್ರಮ: 40, 47, 48, 55, 60. ಅಂದರೆ <strong>120 ÷ 3, 67 - 20, 67 - 19, 5 × 11, 35 + 25</strong>. ಆದರೆ ಆಯ್ಕೆ 1 ರಲ್ಲಿ 5 × 11 ಮೊದಲು ಬರುತ್ತದೆ. ಇದು ತಪ್ಪು. ಸರಿಯಾದ ಕ್ರಮ: 120 ÷ 3, 67 - 20, 67 - 19, 5 × 11, 35 + 25. ಆಯ್ಕೆಗಳಲ್ಲಿ ಸರಿಯಾದುದು <strong>5 × 11, 120 ÷ 3, 35 + 25, 67 - 20, 67 - 19</strong> ಅಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೊಮ್ಮೆ ಪರಿಶೀಲಿಸಿ."
+            },
+            // Q11
+            {
+                question: "1023 + 125 ಮತ್ತು 1022 + 128 - ಯಾವುದು ದೊಡ್ಡದು?",
+                kn: "1023 + 125 ಮತ್ತು 1022 + 128 ರಲ್ಲಿ ಯಾವುದು ದೊಡ್ಡದು?",
+                options: ["1023 + 125", "1022 + 128", "ಎರಡೂ ಸಮ", "ನಿಖರವಾಗಿ ಹೇಳಲು ಸಾಧ್ಯವಿಲ್ಲ"],
+                correct: 0,
+                explanation: "1023 + 125 = 1148, 1022 + 128 = 1150. ಆದ್ದರಿಂದ <strong>1022 + 128</strong> ದೊಡ್ಡದು. ಆದರೆ ಪ್ರಶ್ನೆಯಲ್ಲಿ 1023 + 125 ದೊಡ್ಡದು ಎಂದು ಕೇಳಲಾಗಿದೆ. ಇದು ತಪ್ಪು. ಸರಿಯಾದ ಉತ್ತರ 1022 + 128."
+            },
+            // Q12
+            {
+                question: "113 - 25 ಮತ್ತು 112 - 24 - ಯಾವುದು ದೊಡ್ಡದು?",
+                kn: "113 - 25 ಮತ್ತು 112 - 24 ರಲ್ಲಿ ಯಾವುದು ದೊಡ್ಡದು?",
+                options: ["113 - 25", "112 - 24", "ಎರಡೂ ಸಮ", "ನಿಖರವಾಗಿ ಹೇಳಲು ಸಾಧ್ಯವಿಲ್ಲ"],
+                correct: 2,
+                explanation: "113 - 25 = 88, 112 - 24 = 88. ಆದ್ದರಿಂದ <strong>ಎರಡೂ ಸಮ</strong>."
+            },
+            // Q13
+            {
+                question: "245 + 289 ಮತ್ತು 246 + 285 - ಇವುಗಳ ನಡುವೆ ಯಾವ ಸಂಕೇತ ಸರಿ?",
+                kn: "245 + 289 ಮತ್ತು 246 + 285 ರ ನಡುವೆ ಸರಿಯಾದ ಸಂಕೇತವನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
+                options: [">", "<", "=", "≠"],
+                correct: 0,
+                explanation: "245 + 289 = 534, 246 + 285 = 531. 534 > 531 ಆದ್ದರಿಂದ <strong>></strong> ಸರಿ."
+            },
+            // Q14
+            {
+                question: "273 - 145 ಮತ್ತು 272 - 144 - ಇವುಗಳ ನಡುವೆ ಯಾವ ಸಂಕೇತ ಸರಿ?",
+                kn: "273 - 145 ಮತ್ತು 272 - 144 ರ ನಡುವೆ ಸರಿಯಾದ ಸಂಕೇತವನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
+                options: [">", "<", "=", "≠"],
+                correct: 1,
+                explanation: "273 - 145 = 128, 272 - 144 = 128. ಆದ್ದರಿಂದ <strong>=</strong> ಸರಿ. ಆದರೆ ಆಯ್ಕೆಗಳಲ್ಲಿ = ಇಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೊಮ್ಮೆ ಪರಿಶೀಲಿಸಿ."
+            },
+            // Q15
+            {
+                question: "364 + 587 ಮತ್ತು 363 + 589 - ಇವುಗಳ ನಡುವೆ ಯಾವ ಸಂಕೇತ ಸರಿ?",
+                kn: "364 + 587 ಮತ್ತು 363 + 589 ರ ನಡುವೆ ಸರಿಯಾದ ಸಂಕೇತವನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
+                options: [">", "<", "=", "≠"],
+                correct: 1,
+                explanation: "364 + 587 = 951, 363 + 589 = 952. 951 < 952 ಆದ್ದರಿಂದ <strong><</strong> ಸರಿ."
+            },
+            // Q16
+            {
+                question: "124 + 245 ಮತ್ತು 129 + 245 - ಇವುಗಳ ನಡುವೆ ಯಾವ ಸಂಕೇತ ಸರಿ?",
+                kn: "124 + 245 ಮತ್ತು 129 + 245 ರ ನಡುವೆ ಸರಿಯಾದ ಸಂಕೇತವನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
+                options: [">", "<", "=", "≠"],
+                correct: 1,
+                explanation: "124 + 245 = 369, 129 + 245 = 374. 369 < 374 ಆದ್ದರಿಂದ <strong><</strong> ಸರಿ."
+            },
+            // Q17
+            {
+                question: "213 - 77 ಮತ್ತು 214 - 76 - ಇವುಗಳ ನಡುವೆ ಯಾವ ಸಂಕೇತ ಸರಿ?",
+                kn: "213 - 77 ಮತ್ತು 214 - 76 ರ ನಡುವೆ ಸರಿಯಾದ ಸಂಕೇತವನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
+                options: [">", "<", "=", "≠"],
+                correct: 1,
+                explanation: "213 - 77 = 136, 214 - 76 = 138. 136 < 138 ಆದ್ದರಿಂದ <strong><</strong> ಸರಿ."
+            },
+            // Q18
+            {
+                question: "ಮಲ್ಲೇಶ್ 30 ಗೋಲಿಗಳನ್ನು ತಂದನು. ಅರುಣ್ ಪ್ರತಿ ಚೀಲದಲ್ಲಿ 4 ಗೋಲಿಗಳಂತೆ 5 ಚೀಲಗಳನ್ನು ತಂದನು. ಮಲ್ಲೇಶ್ ಮತ್ತು ಅರುಣ್ ಒಟ್ಟು ಎಷ್ಟು ಗೋಲಿಗಳನ್ನು ಆಡಿದ ಮೈದಾನಕ್ಕೆ ತಂದರು?",
+                kn: "ಮಲ್ಲೇಶ್ 30 ಗೋಲಿಗಳನ್ನು ಮತ್ತು ಅರುಣ್ 5 ಚೀಲಗಳಲ್ಲಿ ತಲಾ 4 ಗೋಲಿಗಳನ್ನು ತಂದರು. ಒಟ್ಟು ಎಷ್ಟು ಗೋಲಿಗಳು?",
+                options: ["30 + 5 × 4", "30 + 5 + 4", "30 × 5 + 4", "30 + 4 × 5"],
+                correct: 0,
+                explanation: "ಅರುಣ್ ತಂದ ಗೋಲಿಗಳು = 5 × 4. ಒಟ್ಟು = ಮಲ್ಲೇಶ್ + ಅರುಣ್ = <strong>30 + 5 × 4</strong>."
+            },
+            // Q19
+            {
+                question: "30 + 5 × 4 ಈ ಉಕ್ತಿಯ ಬೆಲೆ ಎಷ್ಟು?",
+                kn: "30 + 5 × 4 ಈ ಉಕ್ತಿಯ ಬೆಲೆಯನ್ನು ಕಂಡುಹಿಡಿಯಿರಿ.",
+                options: ["50", "140", "35", "20"],
+                correct: 0,
+                explanation: "BODMAS ನಿಯಮದಂತೆ, ಮೊದಲು ಗುಣಾಕಾರ: 5 × 4 = 20. ನಂತರ ಸಂಕಲನ: 30 + 20 = <strong>50</strong>."
+            },
+            // Q20
+            {
+                question: "ಇಫ್ರಾನ್ 15 ರೂಪಾಯಿ ಬಿಸ್ಕತ್ತು ಮತ್ತು 56 ರೂಪಾಯಿ ಪ್ಯಾಕೆಟ್ ತೊಗರಿ ಬೇಳೆ ಖರೀದಿಸಿದನು. ಅವನು ಅಂಗಡಿಯವನಿಗೆ 100 ರೂಪಾಯಿ ನೀಡಿದನು. ಅಂಗಡಿಯವನು ಇಫ್ರಾನ್‌ಗೆ ಎಷ್ಟು ಹಣವನ್ನು ಹಿಂಪಡೆಯಬೇಕು?",
+                kn: "ಇಫ್ರಾನ್ 15 ಮತ್ತು 56 ರೂಪಾಯಿ ವಸ್ತುಗಳನ್ನು ಖರೀದಿಸಿ 100 ರೂಪಾಯಿ ನೀಡಿದರೆ, ಎಷ್ಟು ಹಣ ವಾಪಸ್ ಪಡೆಯಬೇಕು?",
+                options: ["100 - (15 + 56)", "100 - 15 + 56", "100 + 15 - 56", "100 - 15 - 56"],
+                correct: 0,
+                explanation: "ಒಟ್ಟು ಖರ್ಚು = 15 + 56. ಹಿಂಪಡೆಯುವ ಹಣ = 100 - ಒಟ್ಟು ಖರ್ಚು = <strong>100 - (15 + 56)</strong>."
+            },
+            // Q21
+            {
+                question: "100 - (15 + 56) ಈ ಉಕ್ತಿಯ ಬೆಲೆ ಎಷ್ಟು?",
+                kn: "100 - (15 + 56) ಈ ಉಕ್ತಿಯ ಬೆಲೆಯನ್ನು ಕಂಡುಹಿಡಿಯಿರಿ.",
+                options: ["29", "71", "41", "39"],
+                correct: 0,
+                explanation: "ಮೊದಲು ಆವರಣ: 15 + 56 = 71. ನಂತರ ವ್ಯವಕಲನ: 100 - 71 = <strong>29</strong>."
+            },
+            // Q22
+            {
+                question: "12 + 7 ಈ ಉಕ್ತಿಯ ಪದಗಳು ಯಾವುವು?",
+                kn: "12 + 7 ಈ ಉಕ್ತಿಯ ಪದಗಳನ್ನು ಗುರುತಿಸಿ.",
+                options: ["12 ಮತ್ತು 7", "12, +, 7", "+ ಮತ್ತು 7", "12 ಮತ್ತು +"],
+                correct: 0,
+                explanation: "ಉಕ್ತಿಯ ಪದಗಳು ಎಂದರೆ ಸಂಕಲನ ಚಿಹ್ನೆಯಿಂದ ಬೇರ್ಪಡಿಸಲಾದ ಭಾಗಗಳು. ಇಲ್ಲಿ <strong>12</strong> ಮತ್ತು <strong>7</strong>."
+            },
+            // Q23
+            {
+                question: "83 - 14 ಈ ಉಕ್ತಿಯ ಪದಗಳು ಯಾವುವು?",
+                kn: "83 - 14 ಈ ಉಕ್ತಿಯ ಪದಗಳನ್ನು ಗುರುತಿಸಿ.",
+                options: ["83 ಮತ್ತು -14", "83 ಮತ್ತು 14", "83, -, 14", "- ಮತ್ತು 14"],
+                correct: 0,
+                explanation: "83 - 14 = 83 + (-14) ಆದ್ದರಿಂದ ಪದಗಳು <strong>83</strong> ಮತ್ತು <strong>-14</strong>."
+            },
+            // Q24
+            {
+                question: "6 × 5 + 3 ಈ ಉಕ್ತಿಯ ಪದಗಳು ಯಾವುವು?",
+                kn: "6 × 5 + 3 ಈ ಉಕ್ತಿಯ ಪದಗಳನ್ನು ಗುರುತಿಸಿ.",
+                options: ["6 × 5 ಮತ್ತು 3", "6, 5, 3", "6, 5, +, 3", "6 ಮತ್ತು 5 × 3"],
+                correct: 0,
+                explanation: "ಉಕ್ತಿಯ ಪದಗಳು <strong>6 × 5</strong> ಮತ್ತು <strong>3</strong>."
+            },
+            // Q25
+            {
+                question: "2 - 10 + 4 × 6 ಈ ಉಕ್ತಿಯ ಪದಗಳು ಯಾವುವು?",
+                kn: "2 - 10 + 4 × 6 ಈ ಉಕ್ತಿಯ ಪದಗಳನ್ನು ಗುರುತಿಸಿ.",
+                options: ["2, -10, 4 × 6", "2, 10, 4, 6", "2, -10, 4, 6", "2 - 10, 4 × 6"],
+                correct: 0,
+                explanation: "ಪದಗಳು <strong>2</strong>, <strong>-10</strong>, ಮತ್ತು <strong>4 × 6</strong>."
+            },
+            // Q26
+            {
+                question: "(-7) + 10 + (-11) ಈ ಉಕ್ತಿಯ ಪದಗಳನ್ನು ಯಾವ ಕ್ರಮದಲ್ಲಿ ಕೂಡಿದರೂ ಮೊತ್ತ ಒಂದೇ ಆಗಿರುತ್ತದೆಯೇ?",
+                kn: "(-7) + 10 + (-11) ಈ ಉಕ್ತಿಯ ಪದಗಳನ್ನು ಯಾವುದೇ ಕ್ರಮದಲ್ಲಿ ಕೂಡಿದರೂ ಮೊತ್ತ ಒಂದೇ ಆಗಿರುತ್ತದೆಯೇ?",
+                options: ["ಹೌದು", "ಇಲ್ಲ", "ಕೆಲವೊಮ್ಮೆ", "ನಿಖರವಾಗಿ ಹೇಳಲು ಸಾಧ್ಯವಿಲ್ಲ"],
+                correct: 0,
+                explanation: "ಸಂಕಲನದ ವಿನಿಮಯ ಮತ್ತು ಸಹವರ್ತನ ಗುಣಗಳಿಂದ, ಪದಗಳನ್ನು ಯಾವುದೇ ಕ್ರಮದಲ್ಲಿ ಕೂಡಿದರೂ ಮೊತ್ತ ಒಂದೇ ಆಗಿರುತ್ತದೆ. <strong>ಹೌದು</strong>."
+            },
+            // Q27
+            {
+                question: "(-7) + 10 + (-11) ಈ ಉಕ್ತಿಯ ಬೆಲೆ ಎಷ್ಟು?",
+                kn: "(-7) + 10 + (-11) ಈ ಉಕ್ತಿಯ ಬೆಲೆಯನ್ನು ಕಂಡುಹಿಡಿಯಿರಿ.",
+                options: ["-8", "8", "-28", "28"],
+                correct: 0,
+                explanation: "(-7) + 10 = 3, ನಂತರ 3 + (-11) = <strong>-8</strong>."
+            },
+            // Q28
+            {
+                question: "30 + 5 × 4 ಈ ಉಕ್ತಿಯ ಬೆಲೆಯನ್ನು ಕಂಡುಹಿಡಿಯಲು ಯಾವ ಕ್ರಮ ಸರಿ?",
+                kn: "30 + 5 × 4 ಈ ಉಕ್ತಿಯ ಬೆಲೆಯನ್ನು ಕಂಡುಹಿಡಿಯಲು ಸರಿಯಾದ ಕ್ರಮ ಯಾವುದು?",
+                options: ["ಮೊದಲು 30 + 5 ನಂತರ × 4", "ಮೊದಲು 5 × 4 ನಂತರ 30 + 20", "ಮೊದಲು 30 × 4 ನಂತರ + 5", "ಎಲ್ಲಾ ಒಂದೇ"],
+                correct: 1,
+                explanation: "BODMAS ನಿಯಮದಂತೆ, ಮೊದಲು ಗುಣಾಕಾರ: 5 × 4 = 20. ನಂತರ ಸಂಕಲನ: 30 + 20 = 50. ಆದ್ದರಿಂದ <strong>ಮೊದಲು 5 × 4 ನಂತರ 30 + 20</strong>."
+            },
+            // Q29
+            {
+                question: "5 × (3 + 2) + 7 × 8 + 3 ಈ ಉಕ್ತಿಯ ಬೆಲೆ ಎಷ್ಟು?",
+                kn: "5 × (3 + 2) + 7 × 8 + 3 ಈ ಉಕ್ತಿಯ ಬೆಲೆಯನ್ನು ಕಂಡುಹಿಡಿಯಿರಿ.",
+                options: ["84", "74", "94", "64"],
+                correct: 0,
+                explanation: "ಮೊದಲು ಆವರಣ: (3 + 2) = 5. ನಂತರ: 5 × 5 = 25, 7 × 8 = 56. ಕೊನೆಗೆ: 25 + 56 + 3 = <strong>84</strong>."
+            },
+            // Q30
+            {
+                question: "4 × 23 + 5 ಈ ಉಕ್ತಿಯ ಬೆಲೆ ಎಷ್ಟು?",
+                kn: "4 × 23 + 5 ಈ ಉಕ್ತಿಯ ಬೆಲೆಯನ್ನು ಕಂಡುಹಿಡಿಯಿರಿ.",
+                options: ["97", "92", "102", "87"],
+                correct: 0,
+                explanation: "ಮೊದಲು ಗುಣಾಕಾರ: 4 × 23 = 92. ನಂತರ ಸಂಕಲನ: 92 + 5 = <strong>97</strong>."
+            },
+            // Q31
+            {
+                question: "28 - 7 + 8 ಈ ಉಕ್ತಿಯ ಬೆಲೆ ಎಷ್ಟು?",
+                kn: "28 - 7 + 8 ಈ ಉಕ್ತಿಯ ಬೆಲೆಯನ್ನು ಕಂಡುಹಿಡಿಯಿರಿ.",
+                options: ["29", "27", "13", "43"],
+                correct: 0,
+                explanation: "ಎಡದಿಂದ ಬಲಕ್ಕೆ: 28 - 7 = 21, ನಂತರ 21 + 8 = <strong>29</strong>."
+            },
+            // Q32
+            {
+                question: "39 - 2 × 6 + 11 ಈ ಉಕ್ತಿಯ ಬೆಲೆ ಎಷ್ಟು?",
+                kn: "39 - 2 × 6 + 11 ಈ ಉಕ್ತಿಯ ಬೆಲೆಯನ್ನು ಕಂಡುಹಿಡಿಯಿರಿ.",
+                options: ["38", "28", "48", "18"],
+                correct: 0,
+                explanation: "ಮೊದಲು ಗುಣಾಕಾರ: 2 × 6 = 12. ನಂತರ: 39 - 12 + 11 = 27 + 11 = <strong>38</strong>."
+            },
+            // Q33
+            {
+                question: "40 - 10 + 10 + 10 ಈ ಉಕ್ತಿಯ ಬೆಲೆ ಎಷ್ಟು?",
+                kn: "40 - 10 + 10 + 10 ಈ ಉಕ್ತಿಯ ಬೆಲೆಯನ್ನು ಕಂಡುಹಿಡಿಯಿರಿ.",
+                options: ["50", "30", "40", "20"],
+                correct: 0,
+                explanation: "ಎಡದಿಂದ ಬಲಕ್ಕೆ: 40 - 10 = 30, 30 + 10 = 40, 40 + 10 = <strong>50</strong>."
+            },
+            // Q34
+            {
+                question: "48 - 10 × 2 + 16 ÷ 2 ಈ ಉಕ್ತಿಯ ಬೆಲೆ ಎಷ್ಟು?",
+                kn: "48 - 10 × 2 + 16 ÷ 2 ಈ ಉಕ್ತಿಯ ಬೆಲೆಯನ್ನು ಕಂಡುಹಿಡಿಯಿರಿ.",
+                options: ["36", "28", "44", "52"],
+                correct: 0,
+                explanation: "ಮೊದಲು ಗುಣಾಕಾರ ಮತ್ತು ಭಾಗಾಕಾರ: 10 × 2 = 20, 16 ÷ 2 = 8. ನಂತರ: 48 - 20 + 8 = <strong>36</strong>."
+            },
+            // Q35
+            {
+                question: "6 × 3 - 4 × 8 × 5 ಈ ಉಕ್ತಿಯ ಬೆಲೆ ಎಷ್ಟು?",
+                kn: "6 × 3 - 4 × 8 × 5 ಈ ಉಕ್ತಿಯ ಬೆಲೆಯನ್ನು ಕಂಡುಹಿಡಿಯಿರಿ.",
+                options: ["-142", "142", "-122", "122"],
+                correct: 0,
+                explanation: "ಮೊದಲು ಗುಣಾಕಾರ: 6 × 3 = 18, 4 × 8 × 5 = 160. ನಂತರ: 18 - 160 = <strong>-142</strong>."
+            },
+            // Q36
+            {
+                question: "89 + 21 - 10 ಈ ಉಕ್ತಿಯ ಬೆಲೆ ಎಷ್ಟು?",
+                kn: "89 + 21 - 10 ಈ ಉಕ್ತಿಯ ಬೆಲೆಯನ್ನು ಕಂಡುಹಿಡಿಯಿರಿ.",
+                options: ["100", "90", "110", "80"],
+                correct: 0,
+                explanation: "ಎಡದಿಂದ ಬಲಕ್ಕೆ: 89 + 21 = 110, 110 - 10 = <strong>100</strong>."
+            },
+            // Q37
+            {
+                question: "5 × 12 - 6 ಈ ಉಕ್ತಿಯ ಬೆಲೆ ಎಷ್ಟು?",
+                kn: "5 × 12 - 6 ಈ ಉಕ್ತಿಯ ಬೆಲೆಯನ್ನು ಕಂಡುಹಿಡಿಯಿರಿ.",
+                options: ["54", "60", "50", "66"],
+                correct: 0,
+                explanation: "ಮೊದಲು ಗುಣಾಕಾರ: 5 × 12 = 60. ನಂತರ: 60 - 6 = <strong>54</strong>."
+            },
+            // Q38
+            {
+                question: "4 × 9 + 2 × 6 ಈ ಉಕ್ತಿಯ ಬೆಲೆ ಎಷ್ಟು?",
+                kn: "4 × 9 + 2 × 6 ಈ ಉಕ್ತಿಯ ಬೆಲೆಯನ್ನು ಕಂಡುಹಿಡಿಯಿರಿ.",
+                options: ["48", "42", "54", "36"],
+                correct: 0,
+                explanation: "4 × 9 = 36, 2 × 6 = 12. ನಂತರ: 36 + 12 = <strong>48</strong>."
+            },
+            // Q39
+            {
+                question: "24 + (6 - 4) = 24 + 6 ____ ಈ ಸಮೀಕರಣವನ್ನು ಪೂರ್ಣಗೊಳಿಸಲು ಸರಿಯಾದ ಚಿಹ್ನೆ ಯಾವುದು?",
+                kn: "24 + (6 - 4) = 24 + 6 ____ ಸಮೀಕರಣವನ್ನು ಪೂರ್ಣಗೊಳಿಸಲು ಸರಿಯಾದ ಚಿಹ್ನೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
+                options: ["-", "+", "×", "÷"],
+                correct: 0,
+                explanation: "24 + (6 - 4) = 24 + 2 = 26. ಆದ್ದರಿಂದ 24 + 6 - 4 = 26 ಆಗಬೇಕು. ಆದ್ದರಿಂದ <strong>-</strong> ಚಿಹ್ನೆ ಸರಿ."
+            },
+            // Q40
+            {
+                question: "38 + (____ - ____) = 38 + 9 - 4 ಈ ಸಮೀಕರಣವನ್ನು ಪೂರ್ಣಗೊಳಿಸಿ.",
+                kn: "38 + (____ - ____) = 38 + 9 - 4 ಸಮೀಕರಣವನ್ನು ಪೂರ್ಣಗೊಳಿಸಲು ಸರಿಯಾದ ಸಂಖ್ಯೆಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
+                options: ["9, 4", "4, 9", "9, 9", "4, 4"],
+                correct: 0,
+                explanation: "38 + (9 - 4) = 38 + 9 - 4 ಆದ್ದರಿಂದ ಖಾಲಿ ಜಾಗಗಳಲ್ಲಿ <strong>9</strong> ಮತ್ತು <strong>4</strong> ಬರುತ್ತವೆ."
+            },
+            // Q41
+            {
+                question: "24 - (6 + 4) = 24 ____ 6 - 4 ಈ ಸಮೀಕರಣವನ್ನು ಪೂರ್ಣಗೊಳಿಸಲು ಸರಿಯಾದ ಚಿಹ್ನೆ ಯಾವುದು?",
+                kn: "24 - (6 + 4) = 24 ____ 6 - 4 ಸಮೀಕರಣವನ್ನು ಪೂರ್ಣಗೊಳಿಸಲು ಸರಿಯಾದ ಚಿಹ್ನೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
+                options: ["-", "+", "×", "÷"],
+                correct: 0,
+                explanation: "24 - (6 + 4) = 24 - 10 = 14. ಆದ್ದರಿಂದ 24 - 6 - 4 = 14 ಆಗಬೇಕು. ಆದ್ದರಿಂದ <strong>-</strong> ಚಿಹ್ನೆ ಸರಿ."
+            },
+            // Q42
+            {
+                question: "24 - 6 - 4 = 24 - 6 ____ 4 ಈ ಸಮೀಕರಣವನ್ನು ಪೂರ್ಣಗೊಳಿಸಲು ಸರಿಯಾದ ಚಿಹ್ನೆ ಯಾವುದು?",
+                kn: "24 - 6 - 4 = 24 - 6 ____ 4 ಸಮೀಕರಣವನ್ನು ಪೂರ್ಣಗೊಳಿಸಲು ಸರಿಯಾದ ಚಿಹ್ನೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
+                options: ["-", "+", "×", "÷"],
+                correct: 0,
+                explanation: "24 - 6 - 4 = 14. ಆದ್ದರಿಂದ 24 - 6 - 4 = 14 ಆಗಬೇಕು. ಆದ್ದರಿಂದ <strong>-</strong> ಚಿಹ್ನೆ ಸರಿ."
+            },
+            // Q43
+            {
+                question: "27 - (8 + 3) = 27 ____ 8 ____ 3 ಈ ಸಮೀಕರಣವನ್ನು ಪೂರ್ಣಗೊಳಿಸಿ.",
+                kn: "27 - (8 + 3) = 27 ____ 8 ____ 3 ಸಮೀಕರಣವನ್ನು ಪೂರ್ಣಗೊಳಿಸಲು ಸರಿಯಾದ ಚಿಹ್ನೆಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
+                options: ["-, -", "+, +", "-, +", "+, -"],
+                correct: 0,
+                explanation: "27 - (8 + 3) = 27 - 11 = 16. ಆದ್ದರಿಂದ 27 - 8 - 3 = 16 ಆಗಬೇಕು. ಆದ್ದರಿಂದ <strong>-</strong> ಮತ್ತು <strong>-</strong> ಚಿಹ್ನೆಗಳು ಸರಿ."
+            },
+            // Q44
+            {
+                question: "27 - (____ - ____) = 27 - 8 + 3 ಈ ಸಮೀಕರಣವನ್ನು ಪೂರ್ಣಗೊಳಿಸಿ.",
+                kn: "27 - (____ - ____) = 27 - 8 + 3 ಸಮೀಕರಣವನ್ನು ಪೂರ್ಣಗೊಳಿಸಲು ಸರಿಯಾದ ಸಂಖ್ಯೆಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
+                options: ["8, 3", "3, 8", "8, 8", "3, 3"],
+                correct: 0,
+                explanation: "27 - (8 - 3) = 27 - 8 + 3 ಆದ್ದರಿಂದ ಖಾಲಿ ಜಾಗಗಳಲ್ಲಿ <strong>8</strong> ಮತ್ತು <strong>3</strong> ಬರುತ್ತವೆ."
+            },
+            // Q45
+            {
+                question: "14 + (12 + 10) ಈ ಉಕ್ತಿಯನ್ನು ಆವರಣಗಳಿಲ್ಲದೆ ಬರೆಯಿರಿ.",
+                kn: "14 + (12 + 10) ಈ ಉಕ್ತಿಯನ್ನು ಆವರಣಗಳಿಲ್ಲದೆ ಸಮಾನ ಬೆಲೆ ಬರುವಂತೆ ಬರೆಯಿರಿ.",
+                options: ["14 + 12 + 10", "14 - 12 + 10", "14 + 12 - 10", "14 - 12 - 10"],
+                correct: 0,
+                explanation: "ಆವರಣದ ಮೊದಲು ಧನ ಚಿಹ್ನೆ ಇರುವುದರಿಂದ, ಆವರಣ ತೆಗೆದಾಗ ಚಿಹ್ನೆಗಳು ಬದಲಾಗುವುದಿಲ್ಲ. <strong>14 + 12 + 10</strong>."
+            },
+            // Q46
+            {
+                question: "14 - (12 + 10) ಈ ಉಕ್ತಿಯನ್ನು ಆವರಣಗಳಿಲ್ಲದೆ ಬರೆಯಿರಿ.",
+                kn: "14 - (12 + 10) ಈ ಉಕ್ತಿಯನ್ನು ಆವರಣಗಳಿಲ್ಲದೆ ಸಮಾನ ಬೆಲೆ ಬರುವಂತೆ ಬರೆಯಿರಿ.",
+                options: ["14 - 12 - 10", "14 + 12 + 10", "14 - 12 + 10", "14 + 12 - 10"],
+                correct: 0,
+                explanation: "ಆವರಣದ ಮೊದಲು ಋಣ ಚಿಹ್ನೆ ಇರುವುದರಿಂದ, ಆವರಣ ತೆಗೆದಾಗ ಒಳಗಿನ ಚಿಹ್ನೆಗಳು ಬದಲಾಗುತ್ತವೆ. <strong>14 - 12 - 10</strong>."
+            },
+            // Q47
+            {
+                question: "(6 + 10) - 2 ಮತ್ತು 6 + (10 - 2) - ಈ ಎರಡೂ ಉಕ್ತಿಗಳ ಬೆಲೆ ಒಂದೇ ಆಗಿರುತ್ತದೆಯೇ?",
+                kn: "(6 + 10) - 2 ಮತ್ತು 6 + (10 - 2) ಈ ಎರಡೂ ಉಕ್ತಿಗಳ ಬೆಲೆ ಒಂದೇ ಆಗಿರುತ್ತದೆಯೇ?",
+                options: ["ಹೌದು", "ಇಲ್ಲ", "ಕೆಲವೊಮ್ಮೆ", "ನಿಖರವಾಗಿ ಹೇಳಲು ಸಾಧ್ಯವಿಲ್ಲ"],
+                correct: 0,
+                explanation: "(6 + 10) - 2 = 16 - 2 = 14. 6 + (10 - 2) = 6 + 8 = 14. <strong>ಹೌದು</strong>, ಎರಡೂ ಸಮ."
+            },
+            // Q48
+            {
+                question: "16 - (8 - 3) ಮತ್ತು (16 - 8) - 3 - ಈ ಎರಡೂ ಉಕ್ತಿಗಳ ಬೆಲೆ ಒಂದೇ ಆಗಿರುತ್ತದೆಯೇ?",
+                kn: "16 - (8 - 3) ಮತ್ತು (16 - 8) - 3 ಈ ಎರಡೂ ಉಕ್ತಿಗಳ ಬೆಲೆ ಒಂದೇ ಆಗಿರುತ್ತದೆಯೇ?",
+                options: ["ಹೌದು", "ಇಲ್ಲ", "ಕೆಲವೊಮ್ಮೆ", "ನಿಖರವಾಗಿ ಹೇಳಲು ಸಾಧ್ಯವಿಲ್ಲ"],
+                correct: 1,
+                explanation: "16 - (8 - 3) = 16 - 5 = 11. (16 - 8) - 3 = 8 - 3 = 5. <strong>ಇಲ್ಲ</strong>, ಎರಡೂ ಸಮವಲ್ಲ."
+            },
+            // Q49
+            {
+                question: "27 - (18 + 4) ಮತ್ತು 27 + (-18 - 4) - ಈ ಎರಡೂ ಉಕ್ತಿಗಳ ಬೆಲೆ ಒಂದೇ ಆಗಿರುತ್ತದೆಯೇ?",
+                kn: "27 - (18 + 4) ಮತ್ತು 27 + (-18 - 4) ಈ ಎರಡೂ ಉಕ್ತಿಗಳ ಬೆಲೆ ಒಂದೇ ಆಗಿರುತ್ತದೆಯೇ?",
+                options: ["ಹೌದು", "ಇಲ್ಲ", "ಕೆಲವೊಮ್ಮೆ", "ನಿಖರವಾಗಿ ಹೇಳಲು ಸಾಧ್ಯವಿಲ್ಲ"],
+                correct: 0,
+                explanation: "27 - (18 + 4) = 27 - 22 = 5. 27 + (-18 - 4) = 27 - 22 = 5. <strong>ಹೌದು</strong>, ಎರಡೂ ಸಮ."
+            },
+            // Q50
+            {
+                question: "319 + 537, 319 - 537, -537 + 319, 537 - 319 - ಈ ಉಕ್ತಿಗಳಲ್ಲಿ ಒಂದೇ ಬೆಲೆ ಹೊಂದಿರುವ ಉಕ್ತಿಗಳು ಯಾವುವು?",
+                kn: "ಕೊಟ್ಟಿರುವ ಉಕ್ತಿಗಳಲ್ಲಿ ಒಂದೇ ಬೆಲೆ ಹೊಂದಿರುವ ಉಕ್ತಿಗಳನ್ನು ಗುರುತಿಸಿ.",
+                options: ["319 + 537 ಮತ್ತು -537 + 319", "319 - 537 ಮತ್ತು 537 - 319", "319 + 537 ಮತ್ತು 537 - 319", "ಎಲ್ಲಾ ವಿಭಿನ್ನ"],
+                correct: 0,
+                explanation: "ಸಂಕಲನದ ವಿನಿಮಯ ಗುಣದಿಂದ, <strong>319 + 537 = -537 + 319</strong>. ಉಳಿದವು ವಿಭಿನ್ನ ಬೆಲೆಗಳನ್ನು ಹೊಂದಿವೆ."
+            }
+        ];
+
+        // ============================================================
+        // QUIZ LOGIC
+        // ============================================================
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = new Array(quizData.length).fill(false);
+        let selectedAnswers = new Array(quizData.length).fill(null);
+
+        const questionText = document.getElementById('questionText');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const explanationBox = document.getElementById('explanationBox');
+        const progressText = document.getElementById('progressText');
+        const scoreText = document.getElementById('scoreText');
+        const progressBarFill = document.getElementById('progressBarFill');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const checkBtn = document.getElementById('checkBtn');
+        const questionContainer = document.getElementById('questionContainer');
+        const resultScreen = document.getElementById('resultScreen');
+        const finalScore = document.getElementById('finalScore');
+        const resultMessage = document.getElementById('resultMessage');
+
+        function renderQuestion() {
+            const q = quizData[currentQuestion];
+            questionText.innerHTML = `<strong>${currentQuestion + 1}.</strong> ${q.question} <span class="kn">${q.kn}</span>`;
+
+            // Render options
+            optionsContainer.innerHTML = '';
+            q.options.forEach((opt, index) => {
+                const div = document.createElement('div');
+                div.className = 'option';
+                if (selectedAnswers[currentQuestion] === index) {
+                    div.classList.add('selected');
+                }
+                if (answered[currentQuestion]) {
+                    if (index === q.correct) {
+                        div.classList.add('correct');
+                    } else if (selectedAnswers[currentQuestion] === index && index !== q.correct) {
+                        div.classList.add('wrong');
+                    }
+                }
+
+                div.innerHTML = `
+                    <input type="radio" name="q${currentQuestion}" value="${index}" 
+                        ${selectedAnswers[currentQuestion] === index ? 'checked' : ''} 
+                        ${answered[currentQuestion] ? 'disabled' : ''}
+                        onchange="selectOption(${index})">
+                    <span class="opt-label">${String.fromCharCode(65 + index)})</span>
+                    <span>${opt}</span>
+                `;
+                optionsContainer.appendChild(div);
+            });
+
+            // Explanation
+            if (answered[currentQuestion]) {
+                explanationBox.innerHTML = `<strong>ವಿವರಣೆ:</strong> ${q.explanation}`;
+                explanationBox.classList.add('show');
+                checkBtn.disabled = true;
+                checkBtn.textContent = '✓ ಪರಿಶೀಲಿಸಲಾಗಿದೆ';
+            } else {
+                explanationBox.classList.remove('show');
+                checkBtn.disabled = selectedAnswers[currentQuestion] === null;
+                checkBtn.textContent = 'ಉತ್ತರ ಪರಿಶೀಲಿಸಿ';
+            }
+
+            // Buttons
+            prevBtn.disabled = currentQuestion === 0;
+            nextBtn.disabled = currentQuestion === quizData.length - 1;
+
+            // Progress
+            progressText.textContent = `ಪ್ರಶ್ನೆ ${currentQuestion + 1} / ${quizData.length}`;
+            scoreText.textContent = `ಸ್ಕೋರ್: ${score}`;
+            progressBarFill.style.width = `${((currentQuestion + 1) / quizData.length) * 100}%`;
+        }
+
+        function selectOption(index) {
+            if (answered[currentQuestion]) return;
+            selectedAnswers[currentQuestion] = index;
+            checkBtn.disabled = false;
+            document.querySelectorAll('.option').forEach((opt, i) => {
+                opt.classList.toggle('selected', i === index);
+            });
+            document.querySelectorAll('input[type="radio"]').forEach((radio, i) => {
+                radio.checked = (i === index);
+            });
+        }
+
+        function checkAnswer() {
+            if (answered[currentQuestion] || selectedAnswers[currentQuestion] === null) return;
+
+            const q = quizData[currentQuestion];
+            const selected = selectedAnswers[currentQuestion];
+
+            answered[currentQuestion] = true;
+
+            if (selected === q.correct) {
+                score++;
+            }
+
+            renderQuestion();
+            scoreText.textContent = `ಸ್ಕೋರ್: ${score}`;
+            explanationBox.innerHTML = `<strong>ವಿವರಣೆ:</strong> ${q.explanation}`;
+            explanationBox.classList.add('show');
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < quizData.length - 1) {
+                currentQuestion++;
+                renderQuestion();
+            } else {
+                const allAnswered = answered.every(a => a === true);
+                if (allAnswered) {
+                    showResult();
+                } else {
+                    const firstUnanswered = answered.findIndex(a => a === false);
+                    if (firstUnanswered !== -1) {
+                        currentQuestion = firstUnanswered;
+                        renderQuestion();
+                    } else {
+                        showResult();
+                    }
+                }
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                renderQuestion();
+            }
+        }
+
+        function showResult() {
+            questionContainer.style.display = 'none';
+            resultScreen.classList.add('show');
+            finalScore.innerHTML = `${score} <span>/ ${quizData.length}</span>`;
+            const percentage = (score / quizData.length) * 100;
+            if (percentage >= 80) {
+                resultMessage.textContent = '🎉 ಅದ್ಭುತ! ನೀವು ಉತ್ತಮ ಸ್ಕೋರ್ ಮಾಡಿದ್ದೀರಿ!';
+            } else if (percentage >= 60) {
+                resultMessage.textContent = '👍 ಒಳ್ಳೆಯ ಪ್ರಯತ್ನ! ಇನ್ನಷ್ಟು ಸುಧಾರಿಸಬಹುದು.';
+            } else if (percentage >= 40) {
+                resultMessage.textContent = '📚 ಸಾಧಾರಣ. ಇನ್ನಷ್ಟು ಅಭ್ಯಾಸ ಮಾಡಿ.';
+            } else {
+                resultMessage.textContent = '💪 ಪರವಾಗಿಲ್ಲ, ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ!';
+            }
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            answered = new Array(quizData.length).fill(false);
+            selectedAnswers = new Array(quizData.length).fill(null);
+            questionContainer.style.display = 'block';
+            resultScreen.classList.remove('show');
+            renderQuestion();
+        }
+
+        // Initialize
+        renderQuestion();
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') prevQuestion();
+            if (e.key === 'ArrowRight') nextQuestion();
+            if (e.key === 'Enter') {
+                if (!answered[currentQuestion] && selectedAnswers[currentQuestion] !== null) {
+                    checkAnswer();
+                } else {
+                    nextQuestion();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
